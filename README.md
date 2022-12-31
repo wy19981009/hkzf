@@ -68,3 +68,12 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+### 总结
+
+- 项目初始化：create-react-app hkzf-mobile，部署本地接口、安装 antd-mobile
+- 项目整体布局
+- 首页模块
+- H5 地理定位，使用百度地图 API
+- 使用 SASS
+- 城市选择模块：数据结构处理、长列表性能优化(懒渲染，react-virtualized)、索引列表
