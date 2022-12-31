@@ -1,0 +1,16 @@
+body, html {
+  height: 100%;
+  font-family: 'Microsoft YaHei';
+  color: #333;
+  background-color: #fff;
+}
+
+* {
+  box-sizing: border-box;
+  /* 去掉浏览器轮播图滚动时的警告 */
+  touch-action: pan-y;
+}
+
+h2, p {
+  margin: 0;
+}
