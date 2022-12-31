@@ -7,6 +7,9 @@ import './index.scss'
 
 import { NavBar } from 'antd-mobile';
 
+// 导入utils中封装的当前定位功能的方法
+import { getCurrentCity } from '../../utils/index'
+
 // 数据格式化方法
 const formtCityData = (list) => {
     const cityList = {}
@@ -52,7 +55,9 @@ export default class CityList extends React.Component {
         cityList['hot'] = hotRes.data.body;
         // 将索引添加到cityIndex中
         cityIndex.unshift('hot');
-        console.log(cityList, cityIndex);
+        // 获取当前定位城市
+        const curCity = await getCurrentCity();
+        console.log(cityList, cityIndex, curCity);
     }
 
     render() {
