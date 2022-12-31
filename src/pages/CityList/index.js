@@ -144,6 +144,16 @@ export default class CityList extends React.Component {
             </li>)
     }
 
+    // 用于获取List组件中渲染行的信息
+    onRowsRendered = ({ startIndex }) => {
+        // console.log(startIndex);
+        if (this.state.activeIndex !== startIndex) {
+            this.setState({
+                activeIndex: startIndex
+            })
+        }
+    }
+
     render() {
         return (
             <div className="citylist">
@@ -162,6 +172,7 @@ export default class CityList extends React.Component {
                             rowCount={this.state.cityIndex.length}
                             rowHeight={this.getRowHeight}
                             rowRenderer={this.rowRenderer}
+                            onRowsRendered={this.onRowsRendered}
                             width={width}
                         />
                     )}
