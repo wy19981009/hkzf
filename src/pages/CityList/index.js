@@ -5,7 +5,7 @@ import axios from "axios";
 
 import "./index.scss";
 
-import { NavBar } from "antd-mobile";
+import { NavBar, Toast } from "antd-mobile";
 
 // 导入utils中封装的当前定位功能的方法
 import { getCurrentCity } from "../../utils/index";
@@ -59,6 +59,9 @@ const formtCityData = (list) => {
         cityIndex,
     };
 };
+
+// 有房源的城市
+const HOUSE_CITY = ['北京', '上海', '广州', '深圳'];
 export default class CityList extends React.Component {
 
     constructor(props) {
@@ -110,6 +113,18 @@ export default class CityList extends React.Component {
         });
     }
 
+
+    changeCity({ label, value }) {
+        // console.log(curCity);
+        if (HOUSE_CITY.indexOf(label) > -1) {
+            // 有房源
+            localStorage.setItem('hkzf_city', JSON.stringify({ label, value }));
+            this.props.history.go(-1);
+        } else {
+            Toast.info('该城市暂无房源信息', 1, null, false);
+        }
+    }
+
     // 渲染每一行数据的渲染函数
     rowRenderer = ({
         key, // Unique key within array of rows
@@ -129,7 +144,7 @@ export default class CityList extends React.Component {
             <div key={key} style={style} className='city'>
                 <div className='title'>{formatCityIndex(letter)}</div>
                 {cityList[letter].map((item) => (
-                    <div className='name' key={item.value}>
+                    <div className='name' key={item.value} onClick={() => this.changeCity(item)}>
                         {item.label}
                     </div>
                 ))}
