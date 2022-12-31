@@ -28,7 +28,7 @@ const formatCityIndex = (letter) => {
         case '#':
             return '当前定位'
         case 'hot':
-            return '热门城市' 
+            return '热门城市'
         default:
             return letter.toUpperCase()
     }
@@ -66,7 +66,9 @@ export default class CityList extends React.Component {
 
     state = {
         cityList: {},
-        cityIndex: []
+        cityIndex: [],
+        // 高亮索引号
+        activeIndex: 0
     }
 
 
@@ -92,7 +94,7 @@ export default class CityList extends React.Component {
         cityList['#'] = [curCity];
         // 将当前定位城市的索引添加到cityIndex中
         cityIndex.unshift('#');
-        console.log(cityList, cityIndex, curCity);
+        // console.log(cityList, cityIndex, curCity);
         this.setState({
             cityList,
             cityIndex
@@ -108,7 +110,7 @@ export default class CityList extends React.Component {
         style, // 必须的，一定要添加该样式
     }) => {
         // 获取每一行的字母索引
-        const { cityIndex,cityList } = this.state;
+        const { cityIndex, cityList } = this.state;
         const letter = cityIndex[index];
 
         // 获取指定字母索引下的城市列表数据
@@ -130,6 +132,16 @@ export default class CityList extends React.Component {
         // TITLE_HEIGHT + cityList[cityIndex[index]].length * NAME_HEIGHT
         const { cityList, cityIndex } = this.state
         return TITLE_HEIGHT + cityList[cityIndex[index]].length * NAME_HEIGHT;
+    }
+
+    // 封装渲染右侧索引列表的方法
+    renderCityIndex() {
+        // 获取cityIndex，并遍历
+        const { cityIndex, activeIndex } = this.state
+        return cityIndex.map((item, index) =>
+            <li className="city-index-item" key={item}>
+                <span className={activeIndex === index ? 'index-active' : ''}>{item === 'hot' ? '热' : item.toUpperCase()}</span>
+            </li>)
     }
 
     render() {
@@ -154,6 +166,11 @@ export default class CityList extends React.Component {
                         />
                     )}
                 </AutoSizer>
+
+                {/* 右侧索引列表 */}
+                <ul className="city-index">
+                    {this.renderCityIndex()}
+                </ul>
             </div>
         )
     }

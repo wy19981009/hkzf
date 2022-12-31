@@ -14,10 +14,17 @@ html {
   touch-action: pan-y;
 }
 
+ul {
+  list-style: none;
+}
+
 h2, p {
   margin: 0;
 }
 
-html, body, #root, .App {
+html, 
+body, 
+#root, 
+.App {
   height: 100%;
 }
