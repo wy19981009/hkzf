@@ -43,6 +43,10 @@ const navs = [
     },
 ]
 
+// navigator.geolocation.getCurrentPosition(position => {
+//     console.log("当前位置信息：", position);
+// })
+
 
 /* 
     错误：
@@ -110,17 +114,17 @@ export default class Index extends React.Component {
         this.getNews();
 
         // 2 通过 IP 定位获取到当前城市名称。
-        // const curCity = new window.BMap.LocalCity()
-        // curCity.get(async res => {
-        //     // console.log('当前城市信息：', res)
-        //     const result = await axios.get(
-        //         `http://localhost:8080/area/info?name=${res.name}`
-        //     )
-        //     // console.log(result)
-        //     this.setState({
-        //         curCityName: result.data.body.label
-        //     })
-        // })
+        const curCity = new window.BMapGL.LocalCity()
+        curCity.get(async res => {
+            // console.log('当前城市信息：', res)
+            const result = await axios.get(
+                `http://localhost:8080/area/info?name=${res.name}`
+            )
+            // console.log(result)
+            this.setState({
+                curCityName: result.data.body.label
+            })
+        })
     }
 
     // 渲染轮播图结构
