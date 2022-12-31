@@ -8,7 +8,8 @@ import { withRouter } from "react-router-dom";
 // 导入props校验
 import PropTypes from "prop-types";
 
-import './index.scss'
+// import './index.scss'
+import styles from './index.module.css'
 
 
 function NavHeader({ children, history, onLeftClick }) {
@@ -16,7 +17,7 @@ function NavHeader({ children, history, onLeftClick }) {
     const defaultHandler = () => history.go(-1);
     return (
         <NavBar
-            className='navBar'
+            className={styles.navBar}
             mode='light'
             icon={<i className='iconfont icon-back' />}
             onLeftClick={onLeftClick || defaultHandler}

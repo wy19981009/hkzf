@@ -77,3 +77,4 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/t
 - H5 地理定位，使用百度地图 API
 - 使用 SASS
 - 城市选择模块：数据结构处理、长列表性能优化(懒渲染，react-virtualized)、索引列表
+- 解决样式覆盖问题：CSS IN JS
