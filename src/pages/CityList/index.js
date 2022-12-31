@@ -57,6 +57,10 @@ export default class CityList extends React.Component {
         cityIndex.unshift('hot');
         // 获取当前定位城市
         const curCity = await getCurrentCity();
+        // 将当前定位城市数据添加到cityList中
+        cityList['#'] = [curCity];
+        // 将当前定位城市的索引添加到cityIndex中
+        cityIndex.unshift('#');
         console.log(cityList, cityIndex, curCity);
     }
 
