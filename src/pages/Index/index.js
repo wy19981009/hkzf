@@ -62,7 +62,9 @@ export default class Index extends React.Component {
         // 租房小组数据
         groups: [],
         // 最新资讯数据
-        news: []
+        news: [],
+        // 当前城市名称
+        curCityName: '上海'
     }
 
     // 获取轮播图数据的方法
@@ -106,6 +108,19 @@ export default class Index extends React.Component {
         this.getSwipers();
         this.getGroups();
         this.getNews();
+
+        // 2 通过 IP 定位获取到当前城市名称。
+        // const curCity = new window.BMap.LocalCity()
+        // curCity.get(async res => {
+        //     // console.log('当前城市信息：', res)
+        //     const result = await axios.get(
+        //         `http://localhost:8080/area/info?name=${res.name}`
+        //     )
+        //     // console.log(result)
+        //     this.setState({
+        //         curCityName: result.data.body.label
+        //     })
+        // })
     }
 
     // 渲染轮播图结构
@@ -136,24 +151,24 @@ export default class Index extends React.Component {
     // 渲染最新资讯部分
     renderNews() {
         return this.state.news.map(item => (
-          <div className="news-item" key={item.id}>
-            <div className="imgwrap">
-              <img
-                className="img"
-                src={`http://localhost:8080${item.imgSrc}`}
-                alt=""
-              />
+            <div className="news-item" key={item.id}>
+                <div className="imgwrap">
+                    <img
+                        className="img"
+                        src={`http://localhost:8080${item.imgSrc}`}
+                        alt=""
+                    />
+                </div>
+                <Flex className="content" direction="column" justify="between">
+                    <h3 className="title">{item.title}</h3>
+                    <Flex className="info" justify="between">
+                        <span>{item.from}</span>
+                        <span>{item.date}</span>
+                    </Flex>
+                </Flex>
             </div>
-            <Flex className="content" direction="column" justify="between">
-              <h3 className="title">{item.title}</h3>
-              <Flex className="info" justify="between">
-                <span>{item.from}</span>
-                <span>{item.date}</span>
-              </Flex>
-            </Flex>
-          </div>
         ))
-      }
+    }
 
 
     render() {
@@ -167,6 +182,35 @@ export default class Index extends React.Component {
                                 {this.renderSwipers()}
                             </Carousel>) : ''
                     }
+
+                    {/* 搜索框 */}
+                    <Flex className="search-box">
+                        {/* 左侧白色区域 */}
+                        <Flex className="search">
+                            {/* 位置 */}
+                            <div
+                                className="location"
+                                onClick={() => this.props.history.push('/citylist')}
+                            >
+                                <span className="name">{this.state.curCityName}</span>
+                                <i className="iconfont icon-arrow" />
+                            </div>
+
+                            {/* 搜索表单 */}
+                            <div
+                                className="form"
+                                onClick={() => this.props.history.push('/search')}
+                            >
+                                <i className="iconfont icon-seach" />
+                                <span className="text">请输入小区或地址</span>
+                            </div>
+                        </Flex>
+                        {/* 右侧地图图标 */}
+                        <i
+                            className="iconfont icon-map"
+                            onClick={() => this.props.history.push('/map')}
+                        />
+                    </Flex>
                 </div>
 
                 {/* 导航菜单 */}
@@ -195,6 +239,8 @@ export default class Index extends React.Component {
                     <h3 className="group-title">最新资讯</h3>
                     <WingBlank size="md">{this.renderNews()}</WingBlank>
                 </div>
+
+
 
             </div>
         );
