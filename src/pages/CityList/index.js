@@ -44,6 +44,14 @@ export default class CityList extends React.Component {
     async getCityList() {
         const res = await axios.get('http://localhost:8080/area/city?level=1');
         const { cityList, cityIndex } = formtCityData(res.data.body);
+        
+        // 获取热门城市列表
+        const hotRes = await axios.get('http://localhost:8080/area/hot');
+        // console.log(hotRes);
+        // 将热门城市数据添加到cityList中
+        cityList['hot'] = hotRes.data.body;
+        // 将索引添加到cityIndex中
+        cityIndex.unshift('hot');
         console.log(cityList, cityIndex);
     }
 
