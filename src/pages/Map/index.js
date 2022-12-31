@@ -3,7 +3,8 @@ import React from "react";
 // 导入顶部导航栏组件
 import NavHeader from "../../components/NavHeader";
 
-import './index.scss'
+// import './index.scss'
+import styles from './index.module.css'
 
 export default class Map extends React.Component {
 
@@ -18,13 +19,13 @@ export default class Map extends React.Component {
 
     render() {
         return (
-            <div className="map">
+            <div className={styles.map}>
                 {/* 顶部导航栏 */}
                 <NavHeader>
                     地图找房
                 </NavHeader>
                 {/* 地图容器 */}
-                <div id="container">
+                <div id="container" className={styles.container}>
 
                 </div>
             </div>
