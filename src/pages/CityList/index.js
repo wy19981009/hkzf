@@ -5,7 +5,10 @@ import axios from "axios";
 
 import "./index.scss";
 
-import { NavBar, Toast } from "antd-mobile";
+import { Toast } from "antd-mobile";
+
+// 顶部导航栏组件
+import NavHeader from "../../components/NavHeader";
 
 // 导入utils中封装的当前定位功能的方法
 import { getCurrentCity } from "../../utils/index";
@@ -194,14 +197,9 @@ export default class CityList extends React.Component {
         return (
             <div className='citylist'>
                 {/* 顶部导航栏 */}
-                <NavBar
-                    className='navBar'
-                    mode='light'
-                    icon={<i className='iconfont icon-back' />}
-                    onLeftClick={() => this.props.history.go(-1)}
-                >
+                <NavHeader>
                     城市选择
-                </NavBar>
+                </NavHeader>
 
                 {/* 城市列表 */}
                 <AutoSizer>

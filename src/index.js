@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import App from './App';
+
 
 // 导入antd-mobile的样式
 import 'antd-mobile/dist/antd-mobile.css';
@@ -21,5 +21,7 @@ root.render(
     <App />
   </React.StrictMode>
 ); */
+
+import App from './App';
 
 ReactDOM.render(<App />, document.getElementById('root'))
