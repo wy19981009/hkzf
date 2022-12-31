@@ -10,6 +10,9 @@ import './assets/fonts/iconfont.css'
 // 导入自己的样式
 import './index.css';
 
+// 导入react-virtualized组件的样式
+import 'react-virtualized/styles.css'
+
 
 
 /* const root = ReactDOM.createRoot(document.getElementById('root'));
