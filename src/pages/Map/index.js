@@ -8,6 +8,17 @@ import styles from './index.module.css'
 
 const BMapGL = window.BMapGL
 
+// 覆盖物样式
+const labelStyle = {
+    cursor: 'pointer',
+    border: '0px solid rgb(255,0,0)',
+    padding: '0px',
+    whiteSpace: 'nowrap',
+    fontSize: '12px',
+    color: 'rgb(255,255,255)',
+    textAlign: 'center'
+}
+
 export default class Map extends React.Component {
 
     componentDidMount() {
@@ -34,6 +45,33 @@ export default class Map extends React.Component {
                 map.centerAndZoom(point, 11);
                 map.addControl(new BMapGL.ZoomControl())
                 map.addControl(new BMapGL.ScaleControl())
+
+                const opts = {
+                    position: point,
+                    offset: new BMapGL.Size(-35, -35)
+                }
+
+                // 创建label实例对象
+                const label = new BMapGL.Label('', opts)
+
+                // 设置房源覆盖物内容
+                label.setContent(`
+                    <div class="${styles.bubble}">
+                        <p class="${styles.name}">浦东</p>
+                        <p>99套</p>
+                    </div>
+                `)
+                // 调用setstyle()方法设置样式
+                label.setStyle(labelStyle)
+
+                // 点击事件
+                label.addEventListener('click', () => {
+                    console.log('房源覆盖物被点击了');
+                })
+
+                // 在map对象上调用addOverlay()方法，将文本覆盖物调价到地图中
+                map.addOverlay(label)
+
 
             } else {
                 alert('您选择的地址没有解析到结果！');
