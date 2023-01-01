@@ -1,19 +1,15 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-
-
+import React from "react";
+import ReactDOM from "react-dom";
 
 // 导入antd-mobile的样式
-import 'antd-mobile/dist/antd-mobile.css';
+import "antd-mobile/dist/antd-mobile.css";
 // 导入字体图标样式
-import './assets/fonts/iconfont.css'
+import "./assets/fonts/iconfont.css";
 // 导入自己的样式
-import './index.css';
+import "./index.css";
 
 // 导入react-virtualized组件的样式
-import 'react-virtualized/styles.css'
-
-
+import "react-virtualized/styles.css";
 
 /* const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -22,6 +18,6 @@ root.render(
   </React.StrictMode>
 ); */
 
-import App from './App';
+import App from "./App";
 
-ReactDOM.render(<App />, document.getElementById('root'))
+ReactDOM.render(<App />, document.getElementById("root"));

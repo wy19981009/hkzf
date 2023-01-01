@@ -1,7 +1,5 @@
 import React from "react";
-
-// 导入顶部导航栏组件
-import NavHeader from "../../components/NavHeader";
+import { Link } from "react-router-dom";
 
 // 导入axios
 import axios from "axios";
@@ -9,9 +7,14 @@ import axios from "axios";
 // 导入Toast组件
 import { Toast } from "antd-mobile";
 
+// 导入顶部导航栏组件
+import NavHeader from "../../components/NavHeader";
+
+// 导入baseurl
+import { BASE_URL } from "../../utils/url";
+
 // import './index.scss'
 import styles from "./index.module.css";
-import { Link } from "react-router-dom";
 
 const BMapGL = window.BMapGL;
 
@@ -258,11 +261,7 @@ export default class Map extends React.Component {
 		return this.state.housesList.map((item) => (
 			<div className={styles.house} key={item.houseCode}>
 				<div className={styles.imgWrap}>
-					<img
-						className={styles.img}
-						src={`http://localhost:8080${item.houseImg}`}
-						alt=''
-					/>
+					<img className={styles.img} src={BASE_URL + item.houseImg} alt='' />
 				</div>
 				<div className={styles.content}>
 					<h3 className={styles.title}>{item.title}</h3>
