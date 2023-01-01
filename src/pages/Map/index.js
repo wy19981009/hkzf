@@ -2,7 +2,8 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 // 导入axios
-import axios from "axios";
+// import axios from "axios";
+import { API } from "../../utils/api";
 
 // 导入Toast组件
 import { Toast } from "antd-mobile";
@@ -89,7 +90,7 @@ export default class Map extends React.Component {
 		try {
 			// 开启Loading
 			Toast.loading("加载中...", 0, null, false);
-			const res = await axios.get(`http://localhost:8080/area/map?id=${id}`);
+			const res = await API.get(`/area/map?id=${id}`);
 			// 关闭loading
 			Toast.hide();
 			// console.log(res);
@@ -241,7 +242,7 @@ export default class Map extends React.Component {
 		try {
 			// 开启Loading
 			Toast.loading("加载中...", 0, null, false);
-			const res = await axios.get(`http://localhost:8080/houses?cityId=${id}`);
+			const res = await API.get(`/houses?cityId=${id}`);
 			// 关闭loading
 			Toast.hide();
 			// console.log(res);

@@ -4,7 +4,9 @@ import React from "react";
 import { Carousel, Flex, Grid, WingBlank } from "antd-mobile";
 
 // 导入axios
-import axios from "axios";
+// import axios from "axios";
+
+import { API } from "../../utils/api";
 
 // 导入url地址
 import { BASE_URL } from "../../utils/url";
@@ -78,7 +80,7 @@ export default class Index extends React.Component {
 
 	// 获取轮播图数据的方法
 	async getSwipers() {
-		const res = await axios.get("http://localhost:8080/home/swiper");
+		const res = await API.get("/home/swiper");
 		// console.log("轮播图数据", res);
 		this.setState({
 			swipers: res.data.body,
@@ -88,7 +90,7 @@ export default class Index extends React.Component {
 
 	// 获取租房小组数据的方法
 	async getGroups() {
-		const res = await axios.get("http://localhost:8080/home/groups", {
+		const res = await API.get("/home/groups", {
 			params: {
 				area: "AREA%7C88cff55c-aaa4-e2e0",
 			},
@@ -101,7 +103,7 @@ export default class Index extends React.Component {
 
 	// 获取最新咨询数据
 	async getNews() {
-		const res = await axios.get("http://localhost:8080/home/news", {
+		const res = await API.get("/home/news", {
 			params: {
 				area: "AREA%7C88cff55c-aaa4-e2e0",
 			},

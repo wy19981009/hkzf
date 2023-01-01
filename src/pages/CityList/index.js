@@ -1,7 +1,8 @@
 import React from "react";
 
 // 导入axios
-import axios from "axios";
+// import axios from "axios";
+import { API } from "../../utils/api";
 
 import "./index.scss";
 
@@ -27,199 +28,197 @@ const NAME_HEIGHT = 50;
 
 // 封装处理字母索引的方法
 const formatCityIndex = (letter) => {
-    switch (letter) {
-        case "#":
-            return "当前定位";
-        case "hot":
-            return "热门城市";
-        default:
-            return letter.toUpperCase();
-    }
+	switch (letter) {
+		case "#":
+			return "当前定位";
+		case "hot":
+			return "热门城市";
+		default:
+			return letter.toUpperCase();
+	}
 };
 
 // 数据格式化方法
 const formtCityData = (list) => {
-    const cityList = {};
-    // const cityIndex = []
+	const cityList = {};
+	// const cityIndex = []
 
-    // 遍历list数组
-    list.forEach((item) => {
-        // 获取每一个城市的首字母
-        const first = item.short.substr(0, 1);
-        // 判断cityList中是否有该分类，有则直接push，无则创建
-        if (cityList[first]) {
-            cityList[first].push(item);
-        } else {
-            cityList[first] = [item];
-        }
-    });
+	// 遍历list数组
+	list.forEach((item) => {
+		// 获取每一个城市的首字母
+		const first = item.short.substr(0, 1);
+		// 判断cityList中是否有该分类，有则直接push，无则创建
+		if (cityList[first]) {
+			cityList[first].push(item);
+		} else {
+			cityList[first] = [item];
+		}
+	});
 
-    // 获取索引数据
-    const cityIndex = Object.keys(cityList).sort();
+	// 获取索引数据
+	const cityIndex = Object.keys(cityList).sort();
 
-    return {
-        cityList,
-        cityIndex,
-    };
+	return {
+		cityList,
+		cityIndex,
+	};
 };
 
 // 有房源的城市
-const HOUSE_CITY = ['北京', '上海', '广州', '深圳'];
+const HOUSE_CITY = ["北京", "上海", "广州", "深圳"];
 export default class CityList extends React.Component {
+	constructor(props) {
+		super(props);
 
-    constructor(props) {
-        super(props)
+		this.state = {
+			cityList: {},
+			cityIndex: [],
+			// 高亮索引号
+			activeIndex: 0,
+		};
 
-        this.state = {
-            cityList: {},
-            cityIndex: [],
-            // 高亮索引号
-            activeIndex: 0,
-        };
+		// 创建ref
+		this.cityListComponent = React.createRef();
+	}
 
-        // 创建ref
-        this.cityListComponent = React.createRef()
-    }
+	async componentDidMount() {
+		// 这是异步调用的会导致measureAllRows方法报错,所以添加await
+		await this.getCityList();
 
+		// 调用measureAllRows，提前计算List中每一行的高度，实现精确跳转
+		this.cityListComponent.current.measureAllRows();
+	}
 
+	// 获取城市列表的方法
+	async getCityList() {
+		const res = await API.get("/area/city?level=1");
+		const { cityList, cityIndex } = formtCityData(res.data.body);
 
-    async componentDidMount() {
-        // 这是异步调用的会导致measureAllRows方法报错,所以添加await
-        await this.getCityList();
+		// 获取热门城市列表
+		const hotRes = await API.get("/area/hot");
+		// console.log(hotRes);
+		// 将热门城市数据添加到cityList中
+		cityList["hot"] = hotRes.data.body;
+		// 将索引添加到cityIndex中
+		cityIndex.unshift("hot");
+		// 获取当前定位城市
+		const curCity = await getCurrentCity();
+		// 将当前定位城市数据添加到cityList中
+		cityList["#"] = [curCity];
+		// 将当前定位城市的索引添加到cityIndex中
+		cityIndex.unshift("#");
+		// console.log(cityList, cityIndex, curCity);
+		this.setState({
+			cityList,
+			cityIndex,
+		});
+	}
 
-        // 调用measureAllRows，提前计算List中每一行的高度，实现精确跳转
-        this.cityListComponent.current.measureAllRows();
-    }
+	changeCity({ label, value }) {
+		// console.log(curCity);
+		if (HOUSE_CITY.indexOf(label) > -1) {
+			// 有房源
+			localStorage.setItem("hkzf_city", JSON.stringify({ label, value }));
+			this.props.history.go(-1);
+		} else {
+			Toast.info("该城市暂无房源信息", 1, null, false);
+		}
+	}
 
-    // 获取城市列表的方法
-    async getCityList() {
-        const res = await axios.get("http://localhost:8080/area/city?level=1");
-        const { cityList, cityIndex } = formtCityData(res.data.body);
+	// 渲染每一行数据的渲染函数
+	rowRenderer = ({
+		key, // Unique key within array of rows
+		index, // 索引号
+		isScrolling, // 当前项是否在滚动中
+		isVisible, // 当前项在LIST中是可见的
+		style, // 必须的，一定要添加该样式
+	}) => {
+		// 获取每一行的字母索引
+		const { cityIndex, cityList } = this.state;
+		const letter = cityIndex[index];
 
-        // 获取热门城市列表
-        const hotRes = await axios.get("http://localhost:8080/area/hot");
-        // console.log(hotRes);
-        // 将热门城市数据添加到cityList中
-        cityList["hot"] = hotRes.data.body;
-        // 将索引添加到cityIndex中
-        cityIndex.unshift("hot");
-        // 获取当前定位城市
-        const curCity = await getCurrentCity();
-        // 将当前定位城市数据添加到cityList中
-        cityList["#"] = [curCity];
-        // 将当前定位城市的索引添加到cityIndex中
-        cityIndex.unshift("#");
-        // console.log(cityList, cityIndex, curCity);
-        this.setState({
-            cityList,
-            cityIndex,
-        });
-    }
+		// 获取指定字母索引下的城市列表数据
+		// cityList[letter]
 
+		return (
+			<div key={key} style={style} className='city'>
+				<div className='title'>{formatCityIndex(letter)}</div>
+				{cityList[letter].map((item) => (
+					<div
+						className='name'
+						key={item.value}
+						onClick={() => this.changeCity(item)}
+					>
+						{item.label}
+					</div>
+				))}
+			</div>
+		);
+	};
 
-    changeCity({ label, value }) {
-        // console.log(curCity);
-        if (HOUSE_CITY.indexOf(label) > -1) {
-            // 有房源
-            localStorage.setItem('hkzf_city', JSON.stringify({ label, value }));
-            this.props.history.go(-1);
-        } else {
-            Toast.info('该城市暂无房源信息', 1, null, false);
-        }
-    }
+	// 动态计算每一行高度的方法
+	getRowHeight = ({ index }) => {
+		// 索引标题高度 + 城市数量*城市名称高度
+		// TITLE_HEIGHT + cityList[cityIndex[index]].length * NAME_HEIGHT
+		const { cityList, cityIndex } = this.state;
+		return TITLE_HEIGHT + cityList[cityIndex[index]].length * NAME_HEIGHT;
+	};
 
-    // 渲染每一行数据的渲染函数
-    rowRenderer = ({
-        key, // Unique key within array of rows
-        index, // 索引号
-        isScrolling, // 当前项是否在滚动中
-        isVisible, // 当前项在LIST中是可见的
-        style, // 必须的，一定要添加该样式
-    }) => {
-        // 获取每一行的字母索引
-        const { cityIndex, cityList } = this.state;
-        const letter = cityIndex[index];
+	// 封装渲染右侧索引列表的方法
+	renderCityIndex() {
+		// 获取cityIndex，并遍历
+		const { cityIndex, activeIndex } = this.state;
+		return cityIndex.map((item, index) => (
+			<li
+				className='city-index-item'
+				key={item}
+				onClick={() => {
+					// console.log(index);
+					this.cityListComponent.current.scrollToRow(index);
+				}}
+			>
+				<span className={activeIndex === index ? "index-active" : ""}>
+					{item === "hot" ? "热" : item.toUpperCase()}
+				</span>
+			</li>
+		));
+	}
 
-        // 获取指定字母索引下的城市列表数据
-        // cityList[letter]
+	// 用于获取List组件中渲染行的信息
+	onRowsRendered = ({ startIndex }) => {
+		// console.log(startIndex);
+		if (this.state.activeIndex !== startIndex) {
+			this.setState({
+				activeIndex: startIndex,
+			});
+		}
+	};
 
-        return (
-            <div key={key} style={style} className='city'>
-                <div className='title'>{formatCityIndex(letter)}</div>
-                {cityList[letter].map((item) => (
-                    <div className='name' key={item.value} onClick={() => this.changeCity(item)}>
-                        {item.label}
-                    </div>
-                ))}
-            </div>
-        );
-    };
+	render() {
+		return (
+			<div className='citylist'>
+				{/* 顶部导航栏 */}
+				<NavHeader>城市选择</NavHeader>
 
-    // 动态计算每一行高度的方法
-    getRowHeight = ({ index }) => {
-        // 索引标题高度 + 城市数量*城市名称高度
-        // TITLE_HEIGHT + cityList[cityIndex[index]].length * NAME_HEIGHT
-        const { cityList, cityIndex } = this.state;
-        return TITLE_HEIGHT + cityList[cityIndex[index]].length * NAME_HEIGHT;
-    };
+				{/* 城市列表 */}
+				<AutoSizer>
+					{({ height, width }) => (
+						<List
+							ref={this.cityListComponent}
+							height={height}
+							rowCount={this.state.cityIndex.length}
+							rowHeight={this.getRowHeight}
+							rowRenderer={this.rowRenderer}
+							onRowsRendered={this.onRowsRendered}
+							width={width}
+							scrollToAlignment='start'
+						/>
+					)}
+				</AutoSizer>
 
-    // 封装渲染右侧索引列表的方法
-    renderCityIndex() {
-        // 获取cityIndex，并遍历
-        const { cityIndex, activeIndex } = this.state;
-        return cityIndex.map((item, index) => (
-            <li
-                className='city-index-item'
-                key={item}
-                onClick={() => {
-                    // console.log(index);
-                    this.cityListComponent.current.scrollToRow(index)
-                }}
-            >
-                <span className={activeIndex === index ? "index-active" : ""}>
-                    {item === "hot" ? "热" : item.toUpperCase()}
-                </span>
-            </li>
-        ));
-    }
-
-    // 用于获取List组件中渲染行的信息
-    onRowsRendered = ({ startIndex }) => {
-        // console.log(startIndex);
-        if (this.state.activeIndex !== startIndex) {
-            this.setState({
-                activeIndex: startIndex,
-            });
-        }
-    };
-
-    render() {
-        return (
-            <div className='citylist'>
-                {/* 顶部导航栏 */}
-                <NavHeader>
-                    城市选择
-                </NavHeader>
-
-                {/* 城市列表 */}
-                <AutoSizer>
-                    {({ height, width }) => (
-                        <List
-                            ref={this.cityListComponent}
-                            height={height}
-                            rowCount={this.state.cityIndex.length}
-                            rowHeight={this.getRowHeight}
-                            rowRenderer={this.rowRenderer}
-                            onRowsRendered={this.onRowsRendered}
-                            width={width}
-                            scrollToAlignment="start"
-                        />
-                    )}
-                </AutoSizer>
-
-                {/* 右侧索引列表 */}
-                <ul className='city-index'>{this.renderCityIndex()}</ul>
-            </div>
-        );
-    }
+				{/* 右侧索引列表 */}
+				<ul className='city-index'>{this.renderCityIndex()}</ul>
+			</div>
+		);
+	}
 }
