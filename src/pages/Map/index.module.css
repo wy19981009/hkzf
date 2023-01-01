@@ -76,8 +76,8 @@
     transition: all 1s;
     transform: translate3d(0, 330px, 0);
     background: #fff;
-  }
-  
+}
+
 .show {
     transform: translate3d(0, 0, 0);
 }
@@ -85,7 +85,7 @@
 .titleWrap {
     position: relative;
     width: 100%;
-    background-color: #c0c0c2;
+    background: #c0c0c2;
     border-top: 1px solid #c8c8c8;
 }
 
@@ -103,7 +103,7 @@
     padding-right: 15px;
     line-height: 43px;
     font-size: 13px;
-    color: 1e1e1e;
+    color: #1e1e1e;
     vertical-align: middle;
 }
 
