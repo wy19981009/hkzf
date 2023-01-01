@@ -18,7 +18,11 @@ ul {
   list-style: none;
 }
 
-h2, p {
+h1,
+h2,
+h3,
+p,
+ul {
   margin: 0;
 }
 

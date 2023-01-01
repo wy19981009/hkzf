@@ -4,194 +4,273 @@ import React from "react";
 import NavHeader from "../../components/NavHeader";
 
 // 导入axios
-import axios from 'axios';
+import axios from "axios";
 
 // import './index.scss'
-import styles from './index.module.css'
+import styles from "./index.module.css";
+import { Link } from "react-router-dom";
 
-const BMapGL = window.BMapGL
+const BMapGL = window.BMapGL;
 
 // 覆盖物样式
 const labelStyle = {
-    cursor: 'pointer',
-    border: '0px solid rgb(255,0,0)',
-    padding: '0px',
-    whiteSpace: 'nowrap',
-    fontSize: '12px',
-    color: 'rgb(255,255,255)',
-    textAlign: 'center'
-}
+	cursor: "pointer",
+	border: "0px solid rgb(255,0,0)",
+	padding: "0px",
+	whiteSpace: "nowrap",
+	fontSize: "12px",
+	color: "rgb(255,255,255)",
+	textAlign: "center",
+};
 
 export default class Map extends React.Component {
+	state = {
+		// 小区下的房源列表
+		housesList: [],
+		// 是否展示房源列表
+		isShowList: false,
+	};
 
-    componentDidMount() {
-        this.initMap();
-    }
+	componentDidMount() {
+		this.initMap();
+	}
 
-    // 初始化地图
-    initMap() {
-        // 获取当前定位城市
-        const { label, value } = JSON.parse(localStorage.getItem('hkzf_city'));
+	// 初始化地图
+	initMap() {
+		// 获取当前定位城市
+		const { label, value } = JSON.parse(localStorage.getItem("hkzf_city"));
 
-        // 初始化地图实例
-        const map = new BMapGL.Map('container');
-        // 作用：在其他方法中通过this来获取到地图对象 
-        this.map = map;
-        // 设置中心点坐标
-        // const point = new window.BMapGL.Point(116.404, 39.915);
+		// 初始化地图实例
+		const map = new BMapGL.Map("container");
+		// 作用：在其他方法中通过this来获取到地图对象
+		this.map = map;
+		// 设置中心点坐标
+		// const point = new window.BMapGL.Point(116.404, 39.915);
 
-        //创建地址解析器实例
-        const myGeo = new BMapGL.Geocoder();
-        // 将地址解析结果显示在地图上，并调整地图视野
-        myGeo.getPoint(label, async (point) => {
-            if (point) {
-                map.centerAndZoom(point, 11);
-                map.addControl(new BMapGL.ZoomControl())
-                map.addControl(new BMapGL.ScaleControl())
+		//创建地址解析器实例
+		const myGeo = new BMapGL.Geocoder();
+		// 将地址解析结果显示在地图上，并调整地图视野
+		myGeo.getPoint(
+			label,
+			async (point) => {
+				if (point) {
+					map.centerAndZoom(point, 11);
+					map.addControl(new BMapGL.ZoomControl());
+					map.addControl(new BMapGL.ScaleControl());
 
-                // 调用renderOverlays方法
-                this.renderOverlays(value);
+					// 调用renderOverlays方法
+					this.renderOverlays(value);
+				} else {
+					alert("您选择的地址没有解析到结果！");
+				}
+			},
+			label,
+		);
 
-                // 获取房源数据
-                // const res = await axios.get(`http://localhost:8080/area/map?id=${value}`)
-                // console.log(res);
-                // res.data.body.forEach(item => {
+		// 初始化地图
+		// map.centerAndZoom(point, 11);
+	}
 
-                //     const { coord: { longitude, latitude }, label: areaName, count, value } = item
+	// 渲染覆盖物入口
+	async renderOverlays(id) {
+		const res = await axios.get(`http://localhost:8080/area/map?id=${id}`);
+		// console.log(res);
+		const data = res.data.body;
 
-                //     const areaPoint = new BMapGL.Point(longitude, latitude)
-                //     // 创建label实例对象
-                //     const label = new BMapGL.Label('', {
-                //         position: areaPoint,
-                //         offset: new BMapGL.Size(-35, -35)
-                //     })
+		// 获取地图缩放级别
+		this.getTypeAndZoom();
 
-                //     // 添加唯一标识
-                //     label.id = value
+		// 调用getTypeAndZoom()方法获取级别和类型
+		const { nextZoom, type } = this.getTypeAndZoom();
 
-                //     // 设置房源覆盖物内容
-                //     label.setContent(`
-                //     <div class="${styles.bubble}">
-                //         <p class="${styles.name}">${areaName}</p>
-                //         <p>${count}套</p>
-                //     </div>
-                // `)
-                //     // 调用setstyle()方法设置样式
-                //     label.setStyle(labelStyle)
+		data.forEach((item) => {
+			// 创建覆盖物
+			this.createOverlays(item, nextZoom, type);
+		});
+	}
 
-                //     // 点击事件
-                //     label.addEventListener('click', () => {
-                //         console.log('房源覆盖物被点击了', label.id);
-                //         // 放大地图
-                //         map.centerAndZoom(areaPoint, 13)
+	// 计算要绘制的覆盖物类型和下一个缩放级别
+	getTypeAndZoom() {
+		// 调用地图的getZoom()方 法来获取当前缩放级别
+		const zoom = this.map.getZoom();
+		let nextZoom, type;
+		// console.log(zoom);
+		if (zoom >= 10 && zoom <= 12) {
+			// 区缩放级别
+			// 下一个缩放级别
+			nextZoom = 13;
+			// circle 表示绘制圆形
+			type = "circle";
+		} else if (zoom >= 12 && zoom <= 14) {
+			// 镇
+			nextZoom = 15;
+			type = "circle";
+		} else if (zoom >= 14 && zoom <= 16) {
+			// 小区
+			type = "rect";
+		}
 
-                //         // 清除当前覆盖物信息
-                //         map.clearOverlays()
-                //     })
+		return {
+			nextZoom,
+			type,
+		};
+	}
 
-                //     // 在map对象上调用addOverlay()方法，将文本覆盖物调价到地图中
-                //     map.addOverlay(label)
+	// 创建覆盖物方法
+	createOverlays(data, zoom, type) {
+		const {
+			coord: { longitude, latitude },
+			label: areaName,
+			count,
+			value,
+		} = data;
 
-                // })
+		// 创建坐标对象
+		const areaPoint = new BMapGL.Point(longitude, latitude);
+		if (type === "circle") {
+			// 区和镇
+			this.createCircle(areaPoint, areaName, count, value, zoom);
+		} else {
+			// 小区
+			this.createRect(areaPoint, areaName, count, value);
+		}
+	}
 
+	// 创建区镇的覆盖物
+	createCircle(point, name, count, id, zoom) {
+		// 创建label实例对象
+		const label = new BMapGL.Label("", {
+			position: point,
+			offset: new BMapGL.Size(-35, -35),
+		});
 
+		// 添加唯一标识
+		label.id = id;
 
-                // // 创建label实例对象
-                // const label = new BMapGL.Label('', {
-                //     position: point,
-                //     offset: new BMapGL.Size(-35, -35)
-                // })
+		// 设置房源覆盖物内容
+		label.setContent(`
+					    <div class="${styles.bubble}">
+					        <p class="${styles.name}">${name}</p>
+					        <p>${count}套</p>
+					    </div>
+					`);
+		// 调用setstyle()方法设置样式
+		label.setStyle(labelStyle);
 
-                // // 设置房源覆盖物内容
-                // label.setContent(`
-                //     <div class="${styles.bubble}">
-                //         <p class="${styles.name}">浦东</p>
-                //         <p>99套</p>
-                //     </div>
-                // `)
-                // // 调用setstyle()方法设置样式
-                // label.setStyle(labelStyle)
+		// 点击事件
+		label.addEventListener("click", () => {
+			// 调用renderOverlays() 方法
+			this.renderOverlays(id);
+			// 放大地图
+			this.map.centerAndZoom(point, zoom);
 
-                // // 点击事件
-                // label.addEventListener('click', () => {
-                //     console.log('房源覆盖物被点击了');
-                // })
+			// 清除当前覆盖物信息
+			this.map.clearOverlays();
+		});
 
-                // 在map对象上调用addOverlay()方法，将文本覆盖物调价到地图中
-                // map.addOverlay(label)
+		// 在map对象上调用addOverlay()方法，将文本覆盖物调价到地图中
+		this.map.addOverlay(label);
+	}
 
+	// 创建小区覆盖物
+	createRect(point, name, count, id) {
+		// 创建label实例对象
+		const label = new BMapGL.Label("", {
+			position: point,
+			offset: new BMapGL.Size(-50, -28),
+		});
 
-            } else {
-                alert('您选择的地址没有解析到结果！');
-            }
-        }, label)
+		// 添加唯一标识
+		label.id = id;
 
-        // 初始化地图
-        // map.centerAndZoom(point, 11);
-    }
+		// 设置房源覆盖物内容
+		label.setContent(`
+					    <div class="${styles.rect}">
+                            <span class="${styles.housename}">${name}</span>
+                            <span class="${styles.housenum}">${count}套</span>
+                            <i class="${styles.arrow}"></i>
+                        </div>
+					`);
+		// 调用setstyle()方法设置样式
+		label.setStyle(labelStyle);
 
-    // 渲染覆盖物入口
-    async renderOverlays(id) {
-        const res = await axios.get(`http://localhost:8080/area/map?id=${id}`)
-        // console.log(res);
-        const data = res.data.body
+		// 点击事件
+		label.addEventListener("click", () => {
+			// console.log("小区被点击了");
+			// 获取小区房源信息
+			this.getHousesList(id);
+		});
 
-        // 获取地图缩放级别
-        this.getTypeAndZoom()
+		// 在map对象上调用addOverlay()方法，将文本覆盖物调价到地图中
+		this.map.addOverlay(label);
+	}
 
-        // 调用getTypeAndZoom()方法获取级别和类型
-        const { nextZoom, type } = this.getTypeAndZoom()
+	// 获取小区房源数据
+	async getHousesList(id) {
+		const res = await axios.get(`http://localhost:8080/houses?cityId=${id}`);
+		// console.log(res);
+		this.setState({
+			housesList: res.data.body.list,
+			// 展示房源列表信息
+			isShowList: true,
+		});
+	}
 
-        data.forEach(item => {
-            // 创建覆盖物
-            this.createOverlays(item, nextZoom, type)
-        });
+	render() {
+		return (
+			<div className={styles.map}>
+				{/* 顶部导航栏 */}
+				<NavHeader>地图找房</NavHeader>
+				{/* 地图容器 */}
+				<div id='container' className={styles.container}></div>
 
-    }
+				{/* 房源列表 */}
+				<div
+					className={[
+						styles.houseList,
+						this.state.isShowList ? styles.show : "",
+					].join(" ")}
+				>
+					<div className={styles.titleWrap}>
+						<h1 className={styles.listTitle}>房屋列表</h1>
+						<Link className={styles.titleMore} to='/home/list'>
+							更多房源
+						</Link>
+					</div>
 
-    // 计算要绘制的覆盖物类型和下一个缩放级别
-    getTypeAndZoom() {
-        // 调用地图的getZoom()方 法来获取当前缩放级别
-        const zoom = this.map.getZoom();
-        let nextZoom, type
-        // console.log(zoom);
-        if (zoom >= 10 && zoom <= 12) {
-            // 区缩放级别
-            // 下一个缩放级别
-            nextZoom = 13
-            // circle 表示绘制圆形
-            type = 'circle'
-        } else if (zoom >= 12 && zoom <= 14) {
-            // 镇
-            nextZoom = 15
-            type = 'circle'
-        } else if (zoom >= 14 && zoom <= 16) {
-            // 小区
-            type = 'rect'
-        }
-
-        return {
-            nextZoom,
-            type
-        }
-
-    }
-
-    // 创建覆盖物方法
-    createOverlays() { }
-
-    render() {
-        return (
-            <div className={styles.map}>
-                {/* 顶部导航栏 */}
-                <NavHeader>
-                    地图找房
-                </NavHeader>
-                {/* 地图容器 */}
-                <div id="container" className={styles.container}>
-
-                </div>
-            </div>
-        )
-    }
+					<div className={styles.houseItems}>
+						{/* 房屋结构 */}
+						{this.state.housesList.map((item) => (
+							<div className={styles.house} key={item.houseCode}>
+								<div className={styles.imgWrap}>
+									<img
+										className={styles.img}
+										src={`http://localhost:8080${item.houseImg}`}
+										alt=''
+									/>
+								</div>
+								<div className={styles.content}>
+									<h3 className={styles.title}>{item.title}</h3>
+									<div className={styles.desc}>{item.desc}</div>
+									<div>
+										{item.tags.map((tag) => (
+											<span
+												className={[styles.tag, styles.tag1].join(" ")}
+												key={tag}
+											>
+												{tag}
+											</span>
+										))}
+									</div>
+									<div className={styles.price}>
+										<span className={styles.priceNum}>{item.price}</span>元/月
+									</div>
+								</div>
+							</div>
+						))}
+					</div>
+				</div>
+			</div>
+		);
+	}
 }
