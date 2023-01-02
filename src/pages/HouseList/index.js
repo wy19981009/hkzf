@@ -1,7 +1,11 @@
 import React from "react";
 
+import { Flex } from "antd-mobile";
+
 // 导入搜索导航栏组件
 import SearchHeader from "../../components/SearchHeader";
+
+import styles from "./index.module.css";
 
 // 获取当前城市定位信息
 const { label } = JSON.parse(localStorage.getItem("hkzf_city"));
@@ -10,7 +14,10 @@ export default class HouseList extends React.Component {
 	render() {
 		return (
 			<div>
-				<SearchHeader cityName={label} />
+				<Flex className={styles.header}>
+					<i className='iconfont icon-back'></i>
+					<SearchHeader cityName={label} className={styles.searchHeader} />
+				</Flex>
 			</div>
 		);
 	}

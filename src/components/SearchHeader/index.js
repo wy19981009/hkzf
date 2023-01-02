@@ -8,9 +8,9 @@ import PropTypes from "prop-types";
 
 import "./index.scss";
 
-function SearchHeader({ history, cityName }) {
+function SearchHeader({ history, cityName, className }) {
 	return (
-		<Flex className='search-box'>
+		<Flex className={["search-box", className || ""].join(" ")}>
 			{/* 左侧白色区域 */}
 			<Flex className='search'>
 				{/* 位置 */}
@@ -33,6 +33,7 @@ function SearchHeader({ history, cityName }) {
 
 SearchHeader.prototype = {
 	cityName: PropTypes.string.isRequired,
+	className: PropTypes.string,
 };
 
 export default withRouter(SearchHeader);
