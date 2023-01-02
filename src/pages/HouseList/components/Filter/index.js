@@ -53,17 +53,55 @@ export default class Filter extends Component {
 	// 点击标题菜单实现高亮
 	// 注意this指向问题，使用箭头函数解决
 	onTitleClick = (type) => {
-		// console.log(this, type);
-		this.setState((prevState) => {
-			return {
-				titleSelectedStatus: {
-					...prevState.titleSelectedStatus,
-					[type]: true,
-				},
-				// 展示对话框
-				openType: type,
-			};
+		const { titleSelectedStatus, selectedValues } = this.state;
+		// 创建新的标题选中状态对象
+		const newTitleSelectedStatus = { ...titleSelectedStatus };
+		// 遍历标题选中状态对象
+		Object.keys(titleSelectedStatus).forEach((key) => {
+			if (key === type) {
+				// 当前标题
+				newTitleSelectedStatus[type] = true;
+				return;
+			}
+
+			// 其他标题
+			const selectVal = selectedValues[key];
+			if (
+				key === "area" &&
+				(selectVal.length !== 2 || selectVal[0] !== "area")
+			) {
+				// 高亮
+				newTitleSelectedStatus[key] = true;
+			} else if (key === "mode" && selectVal[0] !== "null") {
+				// 高亮
+				newTitleSelectedStatus[key] = true;
+			} else if (key === "price" && selectVal[0] !== "null") {
+				// 高亮
+				newTitleSelectedStatus[key] = true;
+			} else if (key === "more") {
+				// 更多选择项
+			} else {
+				newTitleSelectedStatus[key] = false;
+			}
 		});
+
+		this.setState({
+			// 展示对话框
+			openType: type,
+			// 使用新的状态来高亮
+			titleSelectedStatus: newTitleSelectedStatus,
+		});
+		// console.log(this, type);
+		// this.setState((prevState) => {
+		// 	return {
+		// 		titleSelectedStatus: {
+		// 			...prevState.titleSelectedStatus,
+		// 			[type]: true,
+		// 		},
+		// 		// 展示对话框
+		// 		openType: type,
+		// 	};
+		// });
 	};
 
 	// 取消(隐藏)对话框
