@@ -3,7 +3,7 @@ import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import { Grid, Button, Modal } from "antd-mobile";
 
-import { BASE_URL, isAuth, getToken, API, removeToken } from "../../utils";
+import { BASE_URL, isAuth, API, removeToken } from "../../utils";
 
 import styles from "./index.module.css";
 
@@ -46,11 +46,7 @@ export default class Profile extends Component {
 				text: "退出",
 				onPress: async () => {
 					// 调用退出接口
-					await API.post("/user/logout", null, {
-						headers: {
-							authorization: getToken(),
-						},
-					});
+					await API.post("/user/logout", null);
 					// 移除本地Token
 					removeToken();
 					this.setState({
@@ -68,11 +64,7 @@ export default class Profile extends Component {
 			return;
 		}
 		// 发送请求，获取个人资料
-		const res = await API.get("/user", {
-			headers: {
-				authorization: getToken(),
-			},
-		});
+		const res = await API.get("/user");
 		// console.log(res);
 		if (res.data.status === 200) {
 			const { avatar, nickname } = res.data.body;
@@ -81,6 +73,11 @@ export default class Profile extends Component {
 					avatar: BASE_URL + avatar,
 					nickname,
 				},
+			});
+		} else {
+			// token失效
+			this.setState({
+				isLogin: false,
 			});
 		}
 	}
