@@ -6,15 +6,18 @@ import { Link } from "react-router-dom";
 import { API } from "../../utils";
 
 // 导入withFormik
-import { withFormik } from "formik";
+import { withFormik, Form, Field, ErrorMessage } from "formik";
+
+// 导入yup
+import * as Yup from "yup";
 
 import NavHeader from "../../components/NavHeader";
 
 import styles from "./index.module.css";
 
 // 验证规则：
-// const REG_UNAME = /^[a-zA-Z_\d]{5,8}$/
-// const REG_PWD = /^[a-zA-Z_\d]{5,12}$/
+const REG_UNAME = /^[a-zA-Z_\d]{5,8}$/;
+const REG_PWD = /^[a-zA-Z_\d]{5,12}$/;
 
 class Login extends Component {
 	// state = {
@@ -60,8 +63,6 @@ class Login extends Component {
 	// };
 
 	render() {
-		const { values, handleSubmit, handleChange } = this.props;
-		// console.log(values, handleSubmit, handleChange);
 		return (
 			<div className={styles.root}>
 				{/* 顶部导航 */}
@@ -70,36 +71,40 @@ class Login extends Component {
 
 				{/* 登录表单 */}
 				<WingBlank>
-					<form onSubmit={handleSubmit}>
+					<Form>
 						<div className={styles.formItem}>
-							<input
-								value={values.username}
-								className={styles.input}
+							<Field
 								name='username'
-								onChange={handleChange}
-								placeholder='请输入账号'
-							/>
-						</div>
-						{/* 长度为5到8位，只能出现数字、字母、下划线 */}
-						{/* <div className={styles.error}>账号为必填项</div> */}
-						<div className={styles.formItem}>
-							<input
 								className={styles.input}
-								value={values.password}
-								onChange={handleChange}
+								placeholder='请输入账号'
+							></Field>
+						</div>
+						<ErrorMessage
+							className={styles.error}
+							name='username'
+							component='div'
+						></ErrorMessage>
+
+						<div className={styles.formItem}>
+							<Field
 								name='password'
 								type='password'
+								className={styles.input}
 								placeholder='请输入密码'
-							/>
+							></Field>
 						</div>
-						{/* 长度为5到12位，只能出现数字、字母、下划线 */}
-						{/* <div className={styles.error}>账号为必填项</div> */}
+						<ErrorMessage
+							className={styles.error}
+							name='password'
+							component='div'
+						></ErrorMessage>
+
 						<div className={styles.formSubmit}>
 							<button className={styles.submit} type='submit'>
 								登 录
 							</button>
 						</div>
-					</form>
+					</Form>
 					<Flex className={styles.backHome}>
 						<Flex.Item>
 							<Link to='/registe'>还没有账号，去注册~</Link>
@@ -118,6 +123,16 @@ Login = withFormik({
 		username: "",
 		password: "",
 	}),
+	// 表单验证规则
+	validationSchema: Yup.object().shape({
+		username: Yup.string()
+			.required("账号为必填项")
+			.matches(REG_UNAME, "长度为5到8位，只能出现数字、字母、下划线"),
+		password: Yup.string()
+			.required("密码为必填项")
+			.matches(REG_PWD, "长度为5到12位，只能出现数字、字母、下划线"),
+	}),
+	// 表单提交事件
 	handleSubmit: async (values, { props }) => {
 		const { username, password } = values;
 		// console.log("表单提交了", username, password);
@@ -126,7 +141,7 @@ Login = withFormik({
 			username,
 			password,
 		});
-		console.log(res);
+		// console.log(res);
 		const { status, body, description } = res.data;
 		if (status === 200) {
 			// 登录成功
