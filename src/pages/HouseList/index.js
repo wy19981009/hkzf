@@ -7,7 +7,7 @@ import { API } from "../../utils/api";
 // 导入搜索导航栏组件
 import SearchHeader from "../../components/SearchHeader";
 
-import { List, AutoSizer } from "react-virtualized";
+import { List, AutoSizer, WindowScroller } from "react-virtualized";
 
 import HouseItem from "../../components/HouseItem";
 
