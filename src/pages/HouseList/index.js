@@ -142,7 +142,7 @@ export default class HouseList extends React.Component {
 				</Flex>
 
 				{/* 条件筛选栏 */}
-				<Sticky>
+				<Sticky height={45}>
 					<Filter onFilter={this.onFilter} />
 				</Sticky>
 

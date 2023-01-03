@@ -1,5 +1,6 @@
 import React, { Component, createRef } from "react";
 import styles from "./index.module.css";
+import PropTypes from "prop-types";
 
 class Sticky extends Component {
 	// 创建ref对象
@@ -7,6 +8,7 @@ class Sticky extends Component {
 	content = createRef();
 
 	handleScroll = () => {
+		const { height } = this.props;
 		// console.log("scroll");
 		// 获取DOM方法
 		const placeholderEl = this.placeholder.current;
@@ -16,7 +18,7 @@ class Sticky extends Component {
 		if (top < 0) {
 			// 吸顶
 			contentEl.classList.add(styles.fixed);
-			placeholderEl.style.height = "40px";
+			placeholderEl.style.height = `${height}px`;
 		} else {
 			// 取消吸顶
 			contentEl.classList.remove(styles.fixed);
@@ -45,5 +47,9 @@ class Sticky extends Component {
 		);
 	}
 }
+
+Sticky.propTypes = {
+	height: PropTypes.number.isRequired,
+};
 
 export default Sticky;
