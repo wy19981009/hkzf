@@ -50,11 +50,13 @@
 .dt {
   margin: 20px 0;
   font-size: 15px;
+  padding-left: 15px
 }
 
 .dd {
   border-bottom: 1px solid #e5e5e5;
   padding-bottom: 14px;
+  padding-left: 15px
 }
 
 .dd:last-child {
