@@ -7,9 +7,15 @@ import { API } from "../../utils/api";
 // 导入搜索导航栏组件
 import SearchHeader from "../../components/SearchHeader";
 
+import { List, AutoSizer } from "react-virtualized";
+
+import HouseItem from "../../components/HouseItem";
+
 import Filter from "./components/Filter";
 
 import styles from "./index.module.css";
+
+import { BASE_URL } from "../../utils/url";
 
 // 获取当前城市定位信息
 const { label, value } = JSON.parse(localStorage.getItem("hkzf_city"));
@@ -53,6 +59,28 @@ export default class HouseList extends React.Component {
 		this.searchHouseList();
 	};
 
+	renderHouseList = ({
+		key, // Unique key within array of rows
+		index, // 索引号
+		style, // 必须的，一定要添加该样式
+	}) => {
+		// 根据索引号来获取当前这一行的房屋数据
+		const { list } = this.state;
+		const house = list[index];
+		// console.log(house);
+		return (
+			<HouseItem
+				key={key}
+				style={style}
+				src={BASE_URL + house.houseImg}
+				title={house.title}
+				desc={house.desc}
+				tags={house.tags}
+				price={house.price}
+			/>
+		);
+	};
+
 	render() {
 		return (
 			<div>
@@ -67,6 +95,17 @@ export default class HouseList extends React.Component {
 
 				{/* 条件筛选栏 */}
 				<Filter onFilter={this.onFilter} />
+
+				{/* 房屋列表 */}
+				<div className={styles.houseItems}>
+					<List
+						height={300}
+						rowCount={this.state.count}
+						rowHeight={120}
+						rowRenderer={this.renderHouseList}
+						width={300}
+					/>
+				</div>
 			</div>
 		);
 	}
