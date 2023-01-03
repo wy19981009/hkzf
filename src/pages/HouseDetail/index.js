@@ -1,14 +1,12 @@
 import React, { Component } from "react";
 
-import { Carousel, Flex } from "antd-mobile";
+import { Carousel, Flex, Modal, Toast } from "antd-mobile";
 
-import { API } from "../../utils/api";
+import { API, isAuth, BASE_URL } from "../../utils";
 
 import NavHeader from "../../components/NavHeader";
 import HouseItem from "../../components/HouseItem";
 import HousePackage from "../../components/HousePackage";
-
-import { BASE_URL } from "../../utils/url";
 
 import styles from "./index.module.css";
 
@@ -58,6 +56,8 @@ const labelStyle = {
 	userSelect: "none",
 };
 
+const alert = Modal.alert;
+
 export default class HouseDetail extends Component {
 	state = {
 		isLoading: false,
@@ -93,11 +93,87 @@ export default class HouseDetail extends Component {
 			// 房屋描述
 			description: "",
 		},
+
+		isFavorite: false,
 	};
 
 	componentDidMount() {
 		window.scrollTo(0, 0);
+		// 获取房屋数据
 		this.getHouseDetail();
+		// 检查房源是否收藏
+		this.checkFavorite();
+	}
+
+	handleFavorite = async () => {
+		const isLogin = isAuth();
+		const { history, location, match } = this.props;
+
+		if (!isLogin) {
+			// 未登录
+			return alert("提示", "登录后才能收藏房源，是否去登录？", [
+				{ text: "取消" },
+				{
+					text: "去登录",
+					onPress: () => {
+						history.push("/login", { from: location });
+					},
+				},
+			]);
+		}
+		// 已登录
+		const { isFavorite } = this.state;
+		const { id } = match.params;
+		if (isFavorite) {
+			// 已收藏,删除收藏
+			const res = await API.delete(`/user/favorites/${id}`);
+			// console.log(res);
+			this.setState({
+				isFavorite: false,
+			});
+			if (res.data.status === 200) {
+				// 提示用户取消收藏
+				Toast.info("已取消收藏", 1, null, false);
+			} else {
+				// token超时
+				Toast.info("登录超时，请重新登录！", 2, null, false);
+			}
+		} else {
+			// 未收藏，添加收藏
+			const res = await API.post(`/user/favorites/${id}`);
+			// console.log(res);
+			if (res.data.status === 200) {
+				// 提示用户收藏成功
+				Toast.info("已收藏", 1, null, false);
+				this.setState({
+					isFavorite: true,
+				});
+			} else {
+				// token超时
+				Toast.info("登录超时，请重新登录！", 2, null, false);
+			}
+		}
+	};
+
+	async checkFavorite() {
+		const isLogin = isAuth();
+
+		if (!isLogin) {
+			// 没有登录
+			return;
+		}
+		// 已登录
+		const { id } = this.props.match.params;
+		const res = await API.get(`/user/favorites/${id}`);
+
+		// console.log(res);
+		const { status, body } = res.data;
+		if (status === 200) {
+			// 请求成功，更新
+			this.setState({
+				isFavorite: body.isFavorite,
+			});
+		}
 	}
 
 	async getHouseDetail() {
@@ -106,7 +182,7 @@ export default class HouseDetail extends Component {
 			isLoading: true,
 		});
 		const res = await API.get(`/houses/${id}`);
-		console.log(res);
+		// console.log(res);
 		this.setState({
 			houseInfo: res.data.body,
 			isLoading: false,
@@ -188,6 +264,7 @@ export default class HouseDetail extends Component {
 				supporting,
 				description,
 			},
+			isFavorite,
 		} = this.state;
 
 		return (
@@ -322,17 +399,21 @@ export default class HouseDetail extends Component {
 
 				{/* 底部收藏按钮 */}
 				<Flex className={styles.fixedBottom}>
-					<Flex.Item>
+					<Flex.Item onClick={this.handleFavorite}>
 						<img
-							src={BASE_URL + "/img/unstar.png"}
+							src={
+								BASE_URL + (isFavorite ? "/img/star.png" : "/img/unstar.png")
+							}
 							className={styles.favoriteImg}
 							alt='收藏'
 						/>
-						<span className={styles.favorite}>收藏</span>
+						<span className={styles.favorite}>
+							{isFavorite ? "已收藏" : "收藏"}
+						</span>
 					</Flex.Item>
 					<Flex.Item>在线咨询</Flex.Item>
 					<Flex.Item>
-						<a href='tel:400-618-4000' className={styles.telephone}>
+						<a href='tel:15687751392' className={styles.telephone}>
 							电话预约
 						</a>
 					</Flex.Item>

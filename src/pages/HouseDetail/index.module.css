@@ -244,6 +244,7 @@
   font-size: 17px;
   color: #999;
   background-color: #fff;
+  z-index: 999;
 }
 
 .favorite {
