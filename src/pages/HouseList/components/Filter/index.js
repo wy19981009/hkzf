@@ -183,7 +183,10 @@ export default class Filter extends Component {
 		// 更多more
 		fliters.more = more.join(",");
 
-		console.log(fliters);
+		// console.log(fliters);
+
+		// 调用父组件onFilter方法
+		this.props.onFilter(fliters);
 
 		// console.log(fliters);
 
