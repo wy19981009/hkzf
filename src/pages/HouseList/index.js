@@ -7,6 +7,9 @@ import { API } from "../../utils/api";
 // 导入搜索导航栏组件
 import SearchHeader from "../../components/SearchHeader";
 
+// 导入吸顶组件
+import Sticky from "../../components/Sticky";
+
 import {
 	List,
 	AutoSizer,
@@ -139,7 +142,9 @@ export default class HouseList extends React.Component {
 				</Flex>
 
 				{/* 条件筛选栏 */}
-				<Filter onFilter={this.onFilter} />
+				<Sticky>
+					<Filter onFilter={this.onFilter} />
+				</Sticky>
 
 				{/* 房屋列表 */}
 				<div className={styles.houseItems}>
