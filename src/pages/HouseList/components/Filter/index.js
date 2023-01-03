@@ -154,14 +154,43 @@ export default class Filter extends Component {
 			newTitleSelectedStatus[type] = false;
 		}
 
+		const newSelectedValue = {
+			...this.state.selectedValues,
+			// 值更新
+			[type]: value,
+		};
+
+		// console.log(newSelectedValue);
+
+		const { area, mode, price, more } = newSelectedValue;
+
+		// 筛选条件属性
+		const fliters = {};
+
+		// 区域
+		const areaKey = area[0];
+		let areaValue = "null";
+		if (area.length === 3) {
+			areaValue = area[2] !== "null" ? area[2] : area[1];
+		}
+
+		fliters[areaKey] = areaValue;
+
+		// 方式和租金
+		fliters.mode = mode[0];
+		fliters.price = price[0];
+
+		// 更多more
+		fliters.more = more.join(",");
+
+		console.log(fliters);
+
+		// console.log(fliters);
+
 		this.setState({
 			openType: "",
 			titleSelectedStatus: newTitleSelectedStatus,
-			selectedValues: {
-				...this.state.selectedValues,
-				// 值更新
-				[type]: value,
-			},
+			selectedValues: newSelectedValue,
 		});
 	};
 
