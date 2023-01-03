@@ -7,7 +7,12 @@ import { API } from "../../utils/api";
 // 导入搜索导航栏组件
 import SearchHeader from "../../components/SearchHeader";
 
-import { List, AutoSizer, WindowScroller } from "react-virtualized";
+import {
+	List,
+	AutoSizer,
+	WindowScroller,
+	InfiniteLoader,
+} from "react-virtualized";
 
 import HouseItem from "../../components/HouseItem";
 
@@ -68,6 +73,15 @@ export default class HouseList extends React.Component {
 		const { list } = this.state;
 		const house = list[index];
 		// console.log(house);
+
+		// 判断house是否存在，如果不存在就渲染loading元素占位
+		if (!house) {
+			return (
+				<div key={key} style={style}>
+					<p className={styles.loading}></p>
+				</div>
+			);
+		}
 		return (
 			<HouseItem
 				key={key}
@@ -81,7 +95,38 @@ export default class HouseList extends React.Component {
 		);
 	};
 
+	// 判断每一行是否加载完成
+	isRowLoaded = ({ index }) => {
+		return !!this.state.list[index];
+	};
+
+	// 用来获取更多房屋列表数据
+	loadMoreRows = ({ startIndex, stopIndex }) => {
+		// return fetch(
+		// 	`/path/to/api?startIndex=${startIndex}&stopIndex=${stopIndex}`,
+		// );
+		// console.log(startIndex, stopIndex);
+		return new Promise((resolve) => {
+			API.get("/houses", {
+				params: {
+					cityId: value,
+					...this.filters,
+					start: startIndex,
+					end: stopIndex,
+				},
+			}).then((res) => {
+				// console.log(res);
+				this.setState({
+					list: [...this.state.list, ...res.data.body.list],
+				});
+				// 数据加载完成时，调用resolve方法
+				resolve();
+			});
+		});
+	};
+
 	render() {
+		const { count } = this.state;
 		return (
 			<div>
 				{/* 顶部搜索导航 */}
@@ -98,13 +143,34 @@ export default class HouseList extends React.Component {
 
 				{/* 房屋列表 */}
 				<div className={styles.houseItems}>
-					<List
-						height={300}
-						rowCount={this.state.count}
-						rowHeight={120}
-						rowRenderer={this.renderHouseList}
-						width={300}
-					/>
+					<InfiniteLoader
+						isRowLoaded={this.isRowLoaded}
+						loadMoreRows={this.loadMoreRows}
+						rowCount={count}
+					>
+						{({ onRowsRendered, registerChild }) => (
+							<WindowScroller>
+								{({ height, isScrolling, scrollTop }) => (
+									<AutoSizer>
+										{({ width }) => (
+											<List
+												onRowsRendered={onRowsRendered}
+												ref={registerChild}
+												autoHeight
+												height={height}
+												rowCount={count}
+												rowHeight={120}
+												rowRenderer={this.renderHouseList}
+												width={width}
+												isScrolling={isScrolling}
+												scrollTop={scrollTop}
+											/>
+										)}
+									</AutoSizer>
+								)}
+							</WindowScroller>
+						)}
+					</InfiniteLoader>
 				</div>
 			</div>
 		);
