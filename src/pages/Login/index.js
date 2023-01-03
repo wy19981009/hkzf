@@ -5,6 +5,9 @@ import { Link } from "react-router-dom";
 
 import { API } from "../../utils";
 
+// 导入withFormik
+import { withFormik } from "formik";
+
 import NavHeader from "../../components/NavHeader";
 
 import styles from "./index.module.css";
@@ -14,50 +17,51 @@ import styles from "./index.module.css";
 // const REG_PWD = /^[a-zA-Z_\d]{5,12}$/
 
 class Login extends Component {
-	state = {
-		username: "",
-		password: "",
-	};
+	// state = {
+	// 	username: "",
+	// 	password: "",
+	// };
 
-	getUserName = (e) => {
-		this.setState({
-			username: e.target.value,
-		});
-	};
+	// getUserName = (e) => {
+	// 	this.setState({
+	// 		username: e.target.value,
+	// 	});
+	// };
 
-	getPassword = (e) => {
-		this.setState({
-			password: e.target.value,
-		});
-	};
+	// getPassword = (e) => {
+	// 	this.setState({
+	// 		password: e.target.value,
+	// 	});
+	// };
 
-	// 表单提交
-	handleSubmit = async (e) => {
-		// 阻止默认提交行为
-		e.preventDefault();
+	// // 表单提交
+	// handleSubmit = async (e) => {
+	// 	// 阻止默认提交行为
+	// 	e.preventDefault();
 
-		// 获取账号和密码
-		const { username, password } = this.state;
-		// console.log("表单提交了", username, password);
-		// 发送请求，实现登录
-		const res = await API.post("/user/login", {
-			username: username,
-			password: password,
-		});
-		// console.log(res);
-		const { status, body, description } = res.data;
-		if (status === 200) {
-			// 登录成功
-			localStorage.setItem("hkzf_token", body.token);
-			this.props.history.go(-1);
-		} else {
-			// 登录失败
-			Toast.info(description, 2, null, false);
-		}
-	};
+	// 	// 获取账号和密码
+	// 	const { username, password } = this.state;
+	// 	// console.log("表单提交了", username, password);
+	// 	// 发送请求，实现登录
+	// 	const res = await API.post("/user/login", {
+	// 		username: username,
+	// 		password: password,
+	// 	});
+	// 	// console.log(res);
+	// 	const { status, body, description } = res.data;
+	// 	if (status === 200) {
+	// 		// 登录成功
+	// 		localStorage.setItem("hkzf_token", body.token);
+	// 		this.props.history.go(-1);
+	// 	} else {
+	// 		// 登录失败
+	// 		Toast.info(description, 2, null, false);
+	// 	}
+	// };
 
 	render() {
-		const { username, password } = this.state;
+		const { values, handleSubmit, handleChange } = this.props;
+		// console.log(values, handleSubmit, handleChange);
 		return (
 			<div className={styles.root}>
 				{/* 顶部导航 */}
@@ -66,13 +70,13 @@ class Login extends Component {
 
 				{/* 登录表单 */}
 				<WingBlank>
-					<form onSubmit={this.handleSubmit}>
+					<form onSubmit={handleSubmit}>
 						<div className={styles.formItem}>
 							<input
-								value={username}
+								value={values.username}
 								className={styles.input}
 								name='username'
-								onChange={this.getUserName}
+								onChange={handleChange}
 								placeholder='请输入账号'
 							/>
 						</div>
@@ -81,8 +85,8 @@ class Login extends Component {
 						<div className={styles.formItem}>
 							<input
 								className={styles.input}
-								value={password}
-								onChange={this.getPassword}
+								value={values.password}
+								onChange={handleChange}
 								name='password'
 								type='password'
 								placeholder='请输入密码'
@@ -106,5 +110,33 @@ class Login extends Component {
 		);
 	}
 }
+
+// 使用withFormik高阶组件包装Login组件，提供表单验证
+Login = withFormik({
+	// 提供状态
+	mapPropsToValues: () => ({
+		username: "",
+		password: "",
+	}),
+	handleSubmit: async (values, { props }) => {
+		const { username, password } = values;
+		// console.log("表单提交了", username, password);
+		// 发送请求，实现登录
+		const res = await API.post("/user/login", {
+			username,
+			password,
+		});
+		console.log(res);
+		const { status, body, description } = res.data;
+		if (status === 200) {
+			// 登录成功
+			localStorage.setItem("hkzf_token", body.token);
+			props.history.go(-1);
+		} else {
+			// 登录失败
+			Toast.info(description, 2, null, false);
+		}
+	},
+})(Login);
 
 export default Login;
