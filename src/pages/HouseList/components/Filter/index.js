@@ -1,5 +1,8 @@
 import React, { Component } from "react";
 
+// 导入react-spring组件
+import { Spring } from "react-spring/renderprops";
+
 import FilterTitle from "../FilterTitle";
 import FilterPicker from "../FilterPicker";
 import FilterMore from "../FilterMore";
@@ -280,18 +283,36 @@ export default class Filter extends Component {
 		);
 	}
 
+	// 渲染遮罩层div
+	renderMask() {
+		const { openType } = this.state;
+		const isHide =
+			openType === "area" || openType === "mode" || openType === "price";
+		return (
+			<Spring from={{ opacity: 0 }} to={{ opacity: isHide ? 1 : 0 }}>
+				{(props) => {
+					if (props.opacity === 0) {
+						return null;
+					}
+					return (
+						<div
+							style={props}
+							className={styles.mask}
+							onClick={() => this.onCancel(openType)}
+						/>
+					);
+				}}
+			</Spring>
+		);
+	}
+
 	render() {
-		const { titleSelectedStatus, openType } = this.state;
+		const { titleSelectedStatus } = this.state;
 
 		return (
 			<div className={styles.root}>
 				{/* 前三个菜单的遮罩层 */}
-				{openType === "area" || openType === "mode" || openType === "price" ? (
-					<div
-						className={styles.mask}
-						onClick={() => this.onCancel(openType)}
-					/>
-				) : null}
+				{this.renderMask()}
 				{/* <div className={styles.mask} /> */}
 
 				<div className={styles.content}>
