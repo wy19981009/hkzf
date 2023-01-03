@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Flex } from "antd-mobile";
+import { Flex, Toast } from "antd-mobile";
 
 import { API } from "../../utils/api";
 
@@ -9,6 +9,11 @@ import SearchHeader from "../../components/SearchHeader";
 
 // 导入吸顶组件
 import Sticky from "../../components/Sticky";
+
+// 导入没有房源信息的提示组件
+import NoHouse from "../../components/NoHouse";
+
+import { getCurrentCity } from "../../utils";
 
 import {
 	List,
@@ -26,7 +31,7 @@ import styles from "./index.module.css";
 import { BASE_URL } from "../../utils/url";
 
 // 获取当前城市定位信息
-const { label, value } = JSON.parse(localStorage.getItem("hkzf_city"));
+// const { label, value } = JSON.parse(localStorage.getItem("hkzf_city"));
 
 export default class HouseList extends React.Component {
 	state = {
@@ -34,20 +39,35 @@ export default class HouseList extends React.Component {
 		list: [],
 		// 总条数
 		count: 0,
+		// 数据是否加载中
+		isLoading: false,
 	};
+
+	// 初始化默认值
+	label = "";
+	value = "";
+
 	// 初始化实例属性
 	filters = {};
 
-	componentDidMount() {
+	async componentDidMount() {
+		const { label, value } = await getCurrentCity();
+		this.label = label;
+		this.value = value;
 		this.searchHouseList();
 	}
 	// 用来获取房屋列表数据
 	async searchHouseList() {
+		this.setState({
+			isLoading: true,
+		});
+		// 开启loading
+		Toast.loading("加载中...", 0, null, false);
 		// 获取当前定位城市id
 		// const { value } = JSON.parse(localStorage.getItem("hkzf_city"));
 		const res = await API.get("/houses", {
 			params: {
-				cityId: value,
+				cityId: this.value,
 				...this.filters,
 				start: 1,
 				end: 20,
@@ -55,13 +75,25 @@ export default class HouseList extends React.Component {
 		});
 		// console.log(res);
 		const { count, list } = res.data.body;
+		// 关闭loading
+		Toast.hide();
+
+		// 提示房源数量
+		if (count !== 0) {
+			Toast.info(`共找到${count}套房源`, 2, null, false);
+		}
+
 		this.setState({
 			list,
 			count,
+			// 表示数据加载完成
+			isLoading: false,
 		});
 	}
 	// 接收Filter组件中的条件数据
 	onFilter = (filters) => {
+		// 返回页面顶部
+		window.scrollTo(0, 0);
 		this.filters = filters;
 		// console.log(this.filters);
 		this.searchHouseList();
@@ -112,7 +144,7 @@ export default class HouseList extends React.Component {
 		return new Promise((resolve) => {
 			API.get("/houses", {
 				params: {
-					cityId: value,
+					cityId: this.value,
 					...this.filters,
 					start: startIndex,
 					end: stopIndex,
@@ -128,8 +160,44 @@ export default class HouseList extends React.Component {
 		});
 	};
 
+	renderList() {
+		const { count, isLoading } = this.state;
+		if (count === 0 && !isLoading) {
+			return <NoHouse>没有找到房源，请您换个搜索条件吧~</NoHouse>;
+		}
+		return (
+			<InfiniteLoader
+				isRowLoaded={this.isRowLoaded}
+				loadMoreRows={this.loadMoreRows}
+				rowCount={count}
+			>
+				{({ onRowsRendered, registerChild }) => (
+					<WindowScroller>
+						{({ height, isScrolling, scrollTop }) => (
+							<AutoSizer>
+								{({ width }) => (
+									<List
+										onRowsRendered={onRowsRendered}
+										ref={registerChild}
+										autoHeight
+										height={height}
+										rowCount={count}
+										rowHeight={120}
+										rowRenderer={this.renderHouseList}
+										width={width}
+										isScrolling={isScrolling}
+										scrollTop={scrollTop}
+									/>
+								)}
+							</AutoSizer>
+						)}
+					</WindowScroller>
+				)}
+			</InfiniteLoader>
+		);
+	}
+
 	render() {
-		const { count } = this.state;
 		return (
 			<div>
 				{/* 顶部搜索导航 */}
@@ -138,7 +206,7 @@ export default class HouseList extends React.Component {
 						className='iconfont icon-back'
 						onClick={() => this.props.history.go(-1)}
 					></i>
-					<SearchHeader cityName={label} className={styles.searchHeader} />
+					<SearchHeader cityName={this.label} className={styles.searchHeader} />
 				</Flex>
 
 				{/* 条件筛选栏 */}
@@ -147,36 +215,7 @@ export default class HouseList extends React.Component {
 				</Sticky>
 
 				{/* 房屋列表 */}
-				<div className={styles.houseItems}>
-					<InfiniteLoader
-						isRowLoaded={this.isRowLoaded}
-						loadMoreRows={this.loadMoreRows}
-						rowCount={count}
-					>
-						{({ onRowsRendered, registerChild }) => (
-							<WindowScroller>
-								{({ height, isScrolling, scrollTop }) => (
-									<AutoSizer>
-										{({ width }) => (
-											<List
-												onRowsRendered={onRowsRendered}
-												ref={registerChild}
-												autoHeight
-												height={height}
-												rowCount={count}
-												rowHeight={120}
-												rowRenderer={this.renderHouseList}
-												width={width}
-												isScrolling={isScrolling}
-												scrollTop={scrollTop}
-											/>
-										)}
-									</AutoSizer>
-								)}
-							</WindowScroller>
-						)}
-					</InfiniteLoader>
-				</div>
+				<div className={styles.houseItems}>{this.renderList()}</div>
 			</div>
 		);
 	}

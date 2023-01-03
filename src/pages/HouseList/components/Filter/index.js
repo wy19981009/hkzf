@@ -36,6 +36,8 @@ export default class Filter extends Component {
 	};
 
 	componentDidMount() {
+		// 获取body
+		this.htmlBody = document.body;
 		this.getFiltersData();
 	}
 
@@ -53,6 +55,9 @@ export default class Filter extends Component {
 	// 点击标题菜单实现高亮
 	// 注意this指向问题，使用箭头函数解决
 	onTitleClick = (type) => {
+		// 给body添加样式
+		this.htmlBody.className = "body-fixed";
+
 		const { titleSelectedStatus, selectedValues } = this.state;
 		// 创建新的标题选中状态对象
 		const newTitleSelectedStatus = { ...titleSelectedStatus };
@@ -96,6 +101,7 @@ export default class Filter extends Component {
 
 	// 取消(隐藏)对话框
 	onCancel = (type) => {
+		this.htmlBody.className = "";
 		// console.log(type);
 		const { titleSelectedStatus, selectedValues } = this.state;
 		// 创建新的标题选中状态对象
@@ -130,6 +136,7 @@ export default class Filter extends Component {
 		// console.log(type, value);
 		// 菜单高亮逻辑处理
 		// 其他标题
+		this.htmlBody.className = "";
 
 		const { titleSelectedStatus } = this.state;
 		// 创建新的标题选中状态对象
