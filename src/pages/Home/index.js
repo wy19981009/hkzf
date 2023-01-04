@@ -1,4 +1,4 @@
-import React from "react";
+import React, { lazy } from "react";
 
 import { TabBar } from "antd-mobile";
 
@@ -6,10 +6,11 @@ import { TabBar } from "antd-mobile";
 import "./index.css";
 
 import { Route } from "react-router-dom";
-import News from "../News";
+
 import Index from "../Index";
-import HouseList from "../HouseList";
-import Profile from "../Profile";
+const HouseList = lazy(() => import("../HouseList"));
+const Profile = lazy(() => import("../Profile"));
+const News = lazy(() => import("../News"));
 
 // TabBar数据
 const tabItems = [
