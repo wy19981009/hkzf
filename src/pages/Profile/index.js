@@ -11,14 +11,15 @@ import styles from "./index.module.css";
 const menus = [
 	{ id: 1, name: "我的收藏", iconfont: "icon-coll", to: "/favorate" },
 	{ id: 2, name: "我的出租", iconfont: "icon-ind", to: "/rent" },
-	{ id: 3, name: "看房记录", iconfont: "icon-record" },
+	{ id: 3, name: "看房记录", iconfont: "icon-record", to: "/houseinspection" },
 	{
 		id: 4,
 		name: "成为房主",
 		iconfont: "icon-identity",
+		to: "/becomehomeowner",
 	},
 	{ id: 5, name: "个人资料", iconfont: "icon-myinfo", to: "/personaldata" },
-	{ id: 6, name: "联系我们", iconfont: "icon-cust" },
+	{ id: 6, name: "联系我们", iconfont: "icon-cust", to: "/contactus" },
 ];
 
 // 默认头像
@@ -115,12 +116,14 @@ export default class Profile extends Component {
 									<div className={styles.auth}>
 										<span onClick={this.logout}>退出</span>
 									</div>
-									<div className={styles.edit}>
-										编辑个人资料
-										<span className={styles.arrow}>
-											<i className='iconfont icon-arrow' />
-										</span>
-									</div>
+									<Link to='/personaldata'>
+										<div className={styles.edit}>
+											编辑个人资料
+											<span className={styles.arrow}>
+												<i className='iconfont icon-arrow' />
+											</span>
+										</div>
+									</Link>
 								</>
 							) : (
 								<div className={styles.edit}>

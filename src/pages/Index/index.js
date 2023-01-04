@@ -117,7 +117,7 @@ export default class Index extends React.Component {
 		return this.state.swipers.map((item) => (
 			<a
 				key={item.id}
-				href='http://www.alipay.com'
+				href='/other'
 				style={{ display: "inline-block", width: "100%", height: 212 }}
 			>
 				<img

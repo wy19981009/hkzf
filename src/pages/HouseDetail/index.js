@@ -200,7 +200,7 @@ export default class HouseDetail extends Component {
 		} = this.state;
 
 		return houseImg.map((item) => (
-			<a key={item} href='www.baidu.com'>
+			<a key={item} href='/other'>
 				<img src={BASE_URL + item} alt='' />
 			</a>
 		));

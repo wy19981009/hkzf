@@ -5,7 +5,7 @@ import NavHeader from "../../components/NavHeader";
 
 import { API, BASE_URL } from "../../utils";
 
-import { List } from "antd-mobile";
+import { List, Toast } from "antd-mobile";
 
 const Item = List.Item;
 
@@ -33,7 +33,10 @@ export default class PersonalData extends Component {
 		// console.log(this.state.personalData);
 	}
 
-	renderList() {}
+	changeData() {
+		Toast.info("暂未开发，敬请期待", 1, null, false);
+	}
+
 	render() {
 		const { history } = this.props;
 		const { avatar, gender, nickname, phone } = this.state.personalData;
@@ -44,20 +47,40 @@ export default class PersonalData extends Component {
 				</NavHeader>
 
 				<List>
-					<Item thumb={BASE_URL + avatar} arrow='horizontal' onClick={() => {}}>
+					<Item
+						thumb={BASE_URL + avatar}
+						arrow='horizontal'
+						onClick={() => {
+							this.changeData();
+						}}
+					>
 						头像
 					</Item>
 					<Item
 						extra={gender === "1" ? "男" : "女"}
 						arrow='horizontal'
-						onClick={() => {}}
+						onClick={() => {
+							this.changeData();
+						}}
 					>
 						性别
 					</Item>
-					<Item extra={nickname} arrow='horizontal' onClick={() => {}}>
+					<Item
+						extra={nickname}
+						arrow='horizontal'
+						onClick={() => {
+							this.changeData();
+						}}
+					>
 						昵称
 					</Item>
-					<Item extra={phone} arrow='horizontal' onClick={() => {}}>
+					<Item
+						extra={phone}
+						arrow='horizontal'
+						onClick={() => {
+							this.changeData();
+						}}
+					>
 						电话
 					</Item>
 				</List>
