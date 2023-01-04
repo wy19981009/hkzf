@@ -8,10 +8,7 @@ import SearchHeader from "../../components/SearchHeader";
 // 导入axios
 // import axios from "axios";
 
-import { API } from "../../utils/api";
-
-// 导入url地址
-import { BASE_URL } from "../../utils/url";
+import { API, BASE_URL, getCity } from "../../utils";
 
 // 导入导航菜单图片
 import Nav1 from "../../assets/images/nav-1.png";
@@ -53,20 +50,6 @@ const navs = [
 	},
 ];
 
-// navigator.geolocation.getCurrentPosition(position => {
-//     console.log("当前位置信息：", position);
-// })
-
-/* 
-    错误：
-    轮播图不会自动播放
-    轮播图高度不够
-
-    原因：轮播图数据是动态加载的，加载完成前后轮播图数量不一致
-
-    解决：在状态中调价表示轮播图加载完成的数据；在轮播图数据加载完成时，修改数据状态为true；只有轮播图数据加载完成的情况下，才渲染轮播图组件
-*/
-
 export default class Index extends React.Component {
 	state = {
 		// 轮播图状态数据
@@ -92,9 +75,10 @@ export default class Index extends React.Component {
 
 	// 获取租房小组数据的方法
 	async getGroups() {
+		const { value } = getCity();
 		const res = await API.get("/home/groups", {
 			params: {
-				area: "AREA%7C88cff55c-aaa4-e2e0",
+				area: value,
 			},
 		});
 		// console.log(res);
@@ -105,9 +89,10 @@ export default class Index extends React.Component {
 
 	// 获取最新咨询数据
 	async getNews() {
+		const { value } = getCity();
 		const res = await API.get("/home/news", {
 			params: {
-				area: "AREA%7C88cff55c-aaa4-e2e0",
+				area: value,
 			},
 		});
 		// console.log(res);
@@ -120,19 +105,6 @@ export default class Index extends React.Component {
 		this.getSwipers();
 		this.getGroups();
 		this.getNews();
-
-		// 2 通过 IP 定位获取到当前城市名称。
-		// const curCity = new window.BMapGL.LocalCity()
-		// curCity.get(async res => {
-		//     // console.log('当前城市信息：', res)
-		//     const result = await axios.get(
-		//         `http://localhost:8080/area/info?name=${res.name}`
-		//     )
-		//     // console.log(result)
-		//     this.setState({
-		//         curCityName: result.data.body.label
-		//     })
-		// })
 
 		const curCity = await getCurrentCity();
 		this.setState({

@@ -2,16 +2,9 @@ import React, { lazy, Suspense } from "react";
 import { BrowserRouter as Router, Redirect, Route } from "react-router-dom";
 
 import Home from "./pages/Home";
-// import CityList from "./pages/CityList";
-// import Map from "./pages/Map";
-// import HouseDetail from "./pages/HouseDetail";
-// import Login from "./pages/Login";
-// import Registe from "./pages/Registe";
-// import Rent from "./pages/Rent";
+
 // 路由访问控制组件
 import AuthRoute from "./components/AuthRoute";
-// import RentAdd from "./pages/Rent/Add";
-// import RentSearch from "./pages/Rent/Search";
 
 // 使用动态组件方式导入组件
 const CityList = lazy(() => import("./pages/CityList"));
@@ -22,6 +15,7 @@ const Registe = lazy(() => import("./pages/Registe"));
 const Rent = lazy(() => import("./pages/Rent"));
 const RentAdd = lazy(() => import("./pages/Rent/Add"));
 const RentSearch = lazy(() => import("./pages/Rent/Search"));
+const Favorate = lazy(() => import("./pages/Favorate"));
 
 function App() {
 	return (
@@ -35,6 +29,7 @@ function App() {
 					<Route path='/detail/:id' component={HouseDetail}></Route>
 					<Route path='/login' component={Login}></Route>
 					<Route path='/registe' component={Registe}></Route>
+					<Route path='/favorate' component={Favorate}></Route>
 
 					<AuthRoute exact path='/rent' component={Rent} />
 					<AuthRoute exact path='/rent/add' component={RentAdd} />
