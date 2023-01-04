@@ -2,10 +2,15 @@
   overflow: hidden;
 }
 
+.rent-nav {
+  margin-top: -45px;
+}
+
 .houses {
   padding: 0 10px;
   background-color: #fff;
 }
+
 .empty {
   padding-top: 100px;
   text-align: center;
