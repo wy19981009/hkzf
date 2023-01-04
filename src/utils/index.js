@@ -33,3 +33,5 @@ export { API } from "./api";
 export { BASE_URL } from "./url";
 
 export * from "./auth";
+
+export { getCity, setCity } from "./city";
