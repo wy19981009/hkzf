@@ -1,5 +1,6 @@
 import axios from "axios";
 // 创建并导出获取城市定位的函数
+import { BASE_URL } from "./url";
 export const getCurrentCity = () => {
 	// 判断localStorage中是否有定位城市
 	const localCity = JSON.parse(localStorage.getItem("hkzf_city"));
@@ -11,7 +12,7 @@ export const getCurrentCity = () => {
 				try {
 					// console.log('当前城市信息：', res)
 					const result = await axios.get(
-						`http://localhost:8080/area/info?name=${res.name}`,
+						`${BASE_URL}/area/info?name=${res.name}`,
 					);
 					// console.log(result)
 					// 存储到本地存储中
@@ -30,7 +31,7 @@ export const getCurrentCity = () => {
 };
 
 export { API } from "./api";
-export { BASE_URL } from "./url";
+export { BASE_URL };
 
 export * from "./auth";
 
