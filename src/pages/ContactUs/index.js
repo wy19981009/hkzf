@@ -17,11 +17,15 @@ export default class ContactUs extends Component {
 							电话预约
 						</Item>
 					</a>
-					<a href='/onlinecontact'>
-						<Item arrow='horizontal' onClick={() => {}}>
-							在线联系
-						</Item>
-					</a>
+
+					<Item
+						arrow='horizontal'
+						onClick={() => {
+							this.props.history.push("/onlinecontact");
+						}}
+					>
+						在线联系
+					</Item>
 				</List>
 			</div>
 		);
