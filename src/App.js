@@ -16,6 +16,7 @@ const Rent = lazy(() => import("./pages/Rent"));
 const RentAdd = lazy(() => import("./pages/Rent/Add"));
 const RentSearch = lazy(() => import("./pages/Rent/Search"));
 const Favorate = lazy(() => import("./pages/Favorate"));
+const PersonalData = lazy(() => import("./pages/PersonalData"));
 
 function App() {
 	return (
@@ -30,6 +31,7 @@ function App() {
 					<Route path='/login' component={Login}></Route>
 					<Route path='/registe' component={Registe}></Route>
 					<Route path='/favorate' component={Favorate}></Route>
+					<Route path='/personaldata' component={PersonalData}></Route>
 
 					<AuthRoute exact path='/rent' component={Rent} />
 					<AuthRoute exact path='/rent/add' component={RentAdd} />

@@ -17,7 +17,7 @@ const menus = [
 		name: "成为房主",
 		iconfont: "icon-identity",
 	},
-	{ id: 5, name: "个人资料", iconfont: "icon-myinfo" },
+	{ id: 5, name: "个人资料", iconfont: "icon-myinfo", to: "/personaldata" },
 	{ id: 6, name: "联系我们", iconfont: "icon-cust" },
 ];
 
